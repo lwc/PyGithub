@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,26 +13,39 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class GitObject(GithubObject.BasicGithubObject):
+class GitObject(github.GithubObject.NonCompletableGithubObject):
+    """
+    This class represents GitObjects as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def sha(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._sha)
 
     @property
     def type(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._type)
 
     @property
     def url(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._url)
 
     def _initAttributes(self):
-        self._sha = GithubObject.NotSet
-        self._type = GithubObject.NotSet
-        self._url = GithubObject.NotSet
+        self._sha = github.GithubObject.NotSet
+        self._type = github.GithubObject.NotSet
+        self._url = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "sha" in attributes:  # pragma no branch

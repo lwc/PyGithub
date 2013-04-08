@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,12 +13,16 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class RepositoryKey(GithubObject.GithubObject):
+class RepositoryKey(github.GithubObject.CompletableGithubObject):
+    """
+    This class represents RepositoryKeys as returned for example by http://developer.github.com/v3/todo
+    """
+
     def __init__(self, requester, attributes, completed, repoUrl):
-        GithubObject.GithubObject.__init__(self, requester, attributes, completed)
+        github.GithubObject.CompletableGithubObject.__init__(self, requester, attributes, completed)
         self.__repoUrl = repoUrl
 
     @property
@@ -27,46 +31,71 @@ class RepositoryKey(GithubObject.GithubObject):
 
     @property
     def id(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._id)
         return self._NoneIfNotSet(self._id)
 
     @property
     def key(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._key)
         return self._NoneIfNotSet(self._key)
 
     @property
     def title(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._title)
         return self._NoneIfNotSet(self._title)
 
     @property
     def url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._url)
         return self._NoneIfNotSet(self._url)
 
     @property
     def verified(self):
+        """
+        :type: bool
+        """
         self._completeIfNotSet(self._verified)
         return self._NoneIfNotSet(self._verified)
 
     def delete(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `DELETE /repos/:user/:repo/keys/:id <http://developer.github.com/v3/todo>`_
+        :rtype: None
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "DELETE",
             self.__customUrl,
             None,
             None
         )
 
-    def edit(self, title=GithubObject.NotSet, key=GithubObject.NotSet):
-        assert title is GithubObject.NotSet or isinstance(title, (str, unicode)), title
-        assert key is GithubObject.NotSet or isinstance(key, (str, unicode)), key
+    def edit(self, title=github.GithubObject.NotSet, key=github.GithubObject.NotSet):
+        """
+        :calls: `PATCH /repos/:user/:repo/keys/:id <http://developer.github.com/v3/todo>`_
+        :param title: string
+        :param key: string
+        :rtype: None
+        """
+        assert title is github.GithubObject.NotSet or isinstance(title, (str, unicode)), title
+        assert key is github.GithubObject.NotSet or isinstance(key, (str, unicode)), key
         post_parameters = dict()
-        if title is not GithubObject.NotSet:
+        if title is not github.GithubObject.NotSet:
             post_parameters["title"] = title
-        if key is not GithubObject.NotSet:
+        if key is not github.GithubObject.NotSet:
             post_parameters["key"] = key
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "PATCH",
             self.__customUrl,
             None,
@@ -75,11 +104,11 @@ class RepositoryKey(GithubObject.GithubObject):
         self._useAttributes(data)
 
     def _initAttributes(self):
-        self._id = GithubObject.NotSet
-        self._key = GithubObject.NotSet
-        self._title = GithubObject.NotSet
-        self._url = GithubObject.NotSet
-        self._verified = GithubObject.NotSet
+        self._id = github.GithubObject.NotSet
+        self._key = github.GithubObject.NotSet
+        self._title = github.GithubObject.NotSet
+        self._url = github.GithubObject.NotSet
+        self._verified = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "id" in attributes:  # pragma no branch

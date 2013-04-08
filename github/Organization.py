@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,140 +13,221 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
-import PaginatedList
+import github.GithubObject
+import github.PaginatedList
 
-import Plan
-import Team
-import Event
-import Repository
-import NamedUser
+import github.Plan
+import github.Team
+import github.Event
+import github.Repository
+import github.NamedUser
 
 
-class Organization(GithubObject.GithubObject):
+class Organization(github.GithubObject.CompletableGithubObject):
+    """
+    This class represents Organizations as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def avatar_url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._avatar_url)
         return self._NoneIfNotSet(self._avatar_url)
 
     @property
     def billing_email(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._billing_email)
         return self._NoneIfNotSet(self._billing_email)
 
     @property
     def blog(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._blog)
         return self._NoneIfNotSet(self._blog)
 
     @property
     def collaborators(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._collaborators)
         return self._NoneIfNotSet(self._collaborators)
 
     @property
     def company(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._company)
         return self._NoneIfNotSet(self._company)
 
     @property
     def created_at(self):
+        """
+        :type: datetime.datetime
+        """
         self._completeIfNotSet(self._created_at)
         return self._NoneIfNotSet(self._created_at)
 
     @property
     def disk_usage(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._disk_usage)
         return self._NoneIfNotSet(self._disk_usage)
 
     @property
     def email(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._email)
         return self._NoneIfNotSet(self._email)
 
     @property
     def followers(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._followers)
         return self._NoneIfNotSet(self._followers)
 
     @property
     def following(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._following)
         return self._NoneIfNotSet(self._following)
 
     @property
     def gravatar_id(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._gravatar_id)
         return self._NoneIfNotSet(self._gravatar_id)
 
     @property
     def html_url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._html_url)
         return self._NoneIfNotSet(self._html_url)
 
     @property
     def id(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._id)
         return self._NoneIfNotSet(self._id)
 
     @property
     def location(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._location)
         return self._NoneIfNotSet(self._location)
 
     @property
     def login(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._login)
         return self._NoneIfNotSet(self._login)
 
     @property
     def name(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._name)
         return self._NoneIfNotSet(self._name)
 
     @property
     def owned_private_repos(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._owned_private_repos)
         return self._NoneIfNotSet(self._owned_private_repos)
 
     @property
     def plan(self):
+        """
+        :type: :class:`github.Plan.Plan`
+        """
         self._completeIfNotSet(self._plan)
         return self._NoneIfNotSet(self._plan)
 
     @property
     def private_gists(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._private_gists)
         return self._NoneIfNotSet(self._private_gists)
 
     @property
     def public_gists(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._public_gists)
         return self._NoneIfNotSet(self._public_gists)
 
     @property
     def public_repos(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._public_repos)
         return self._NoneIfNotSet(self._public_repos)
 
     @property
     def total_private_repos(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._total_private_repos)
         return self._NoneIfNotSet(self._total_private_repos)
 
     @property
     def type(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._type)
         return self._NoneIfNotSet(self._type)
 
     @property
     def url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._url)
         return self._NoneIfNotSet(self._url)
 
     def add_to_public_members(self, public_member):
-        assert isinstance(public_member, NamedUser.NamedUser), public_member
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `PUT /orgs/:org/public_members/:user <http://developer.github.com/v3/todo>`_
+        :param public_member: :class:`github.NamedUser.NamedUser`
+        :rtype: None
+        """
+        assert isinstance(public_member, github.NamedUser.NamedUser), public_member
+        headers, data = self._requester.requestJsonAndCheck(
             "PUT",
             self.url + "/public_members/" + public_member._identity,
             None,
@@ -154,98 +235,134 @@ class Organization(GithubObject.GithubObject):
         )
 
     def create_fork(self, repo):
-        assert isinstance(repo, Repository.Repository), repo
+        """
+        :calls: `POST /repos/:user/:repo/forks <http://developer.github.com/v3/todo>`_
+        :param repo: :class:`github.Repository.Repository`
+        :rtype: :class:`github.Repository.Repository`
+        """
+        assert isinstance(repo, github.Repository.Repository), repo
         url_parameters = {
             "org": self.login,
         }
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "POST",
             "/repos/" + repo.owner.login + "/" + repo.name + "/forks",
             url_parameters,
             None
         )
-        return Repository.Repository(self._requester, data, completed=True)
+        return github.Repository.Repository(self._requester, data, completed=True)
 
-    def create_repo(self, name, description=GithubObject.NotSet, homepage=GithubObject.NotSet, private=GithubObject.NotSet, has_issues=GithubObject.NotSet, has_wiki=GithubObject.NotSet, has_downloads=GithubObject.NotSet, team_id=GithubObject.NotSet, auto_init=GithubObject.NotSet, gitignore_template=GithubObject.NotSet):
+    def create_repo(self, name, description=github.GithubObject.NotSet, homepage=github.GithubObject.NotSet, private=github.GithubObject.NotSet, has_issues=github.GithubObject.NotSet, has_wiki=github.GithubObject.NotSet, has_downloads=github.GithubObject.NotSet, team_id=github.GithubObject.NotSet, auto_init=github.GithubObject.NotSet, gitignore_template=github.GithubObject.NotSet):
+        """
+        :calls: `POST /orgs/:org/repos <http://developer.github.com/v3/todo>`_
+        :param name: string
+        :param description: string
+        :param homepage: string
+        :param private: bool
+        :param has_issues: bool
+        :param has_wiki: bool
+        :param has_downloads: bool
+        :param team_id: :class:`github.Team.Team`
+        :param auto_init: bool
+        :param gitignore_template: string
+        :rtype: :class:`github.Repository.Repository`
+        """
         assert isinstance(name, (str, unicode)), name
-        assert description is GithubObject.NotSet or isinstance(description, (str, unicode)), description
-        assert homepage is GithubObject.NotSet or isinstance(homepage, (str, unicode)), homepage
-        assert private is GithubObject.NotSet or isinstance(private, bool), private
-        assert has_issues is GithubObject.NotSet or isinstance(has_issues, bool), has_issues
-        assert has_wiki is GithubObject.NotSet or isinstance(has_wiki, bool), has_wiki
-        assert has_downloads is GithubObject.NotSet or isinstance(has_downloads, bool), has_downloads
-        assert team_id is GithubObject.NotSet or isinstance(team_id, Team.Team), team_id
-        assert auto_init is GithubObject.NotSet or isinstance(auto_init, bool), auto_init
-        assert gitignore_template is GithubObject.NotSet or isinstance(gitignore_template, (str, unicode)), gitignore_template
+        assert description is github.GithubObject.NotSet or isinstance(description, (str, unicode)), description
+        assert homepage is github.GithubObject.NotSet or isinstance(homepage, (str, unicode)), homepage
+        assert private is github.GithubObject.NotSet or isinstance(private, bool), private
+        assert has_issues is github.GithubObject.NotSet or isinstance(has_issues, bool), has_issues
+        assert has_wiki is github.GithubObject.NotSet or isinstance(has_wiki, bool), has_wiki
+        assert has_downloads is github.GithubObject.NotSet or isinstance(has_downloads, bool), has_downloads
+        assert team_id is github.GithubObject.NotSet or isinstance(team_id, github.Team.Team), team_id
+        assert auto_init is github.GithubObject.NotSet or isinstance(auto_init, bool), auto_init
+        assert gitignore_template is github.GithubObject.NotSet or isinstance(gitignore_template, (str, unicode)), gitignore_template
         post_parameters = {
             "name": name,
         }
-        if description is not GithubObject.NotSet:
+        if description is not github.GithubObject.NotSet:
             post_parameters["description"] = description
-        if homepage is not GithubObject.NotSet:
+        if homepage is not github.GithubObject.NotSet:
             post_parameters["homepage"] = homepage
-        if private is not GithubObject.NotSet:
+        if private is not github.GithubObject.NotSet:
             post_parameters["private"] = private
-        if has_issues is not GithubObject.NotSet:
+        if has_issues is not github.GithubObject.NotSet:
             post_parameters["has_issues"] = has_issues
-        if has_wiki is not GithubObject.NotSet:
+        if has_wiki is not github.GithubObject.NotSet:
             post_parameters["has_wiki"] = has_wiki
-        if has_downloads is not GithubObject.NotSet:
+        if has_downloads is not github.GithubObject.NotSet:
             post_parameters["has_downloads"] = has_downloads
-        if team_id is not GithubObject.NotSet:
+        if team_id is not github.GithubObject.NotSet:
             post_parameters["team_id"] = team_id._identity
-        if auto_init is not GithubObject.NotSet:
+        if auto_init is not github.GithubObject.NotSet:
             post_parameters["auto_init"] = auto_init
-        if gitignore_template is not GithubObject.NotSet:
+        if gitignore_template is not github.GithubObject.NotSet:
             post_parameters["gitignore_template"] = gitignore_template
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "POST",
             self.url + "/repos",
             None,
             post_parameters
         )
-        return Repository.Repository(self._requester, data, completed=True)
+        return github.Repository.Repository(self._requester, data, completed=True)
 
-    def create_team(self, name, repo_names=GithubObject.NotSet, permission=GithubObject.NotSet):
+    def create_team(self, name, repo_names=github.GithubObject.NotSet, permission=github.GithubObject.NotSet):
+        """
+        :calls: `POST /orgs/:org/teams <http://developer.github.com/v3/todo>`_
+        :param name: string
+        :param repo_names: list of :class:`github.Repository.Repository`
+        :param permission: string
+        :rtype: :class:`github.Team.Team`
+        """
         assert isinstance(name, (str, unicode)), name
-        assert repo_names is GithubObject.NotSet or all(isinstance(element, Repository.Repository) for element in repo_names), repo_names
-        assert permission is GithubObject.NotSet or isinstance(permission, (str, unicode)), permission
+        assert repo_names is github.GithubObject.NotSet or all(isinstance(element, github.Repository.Repository) for element in repo_names), repo_names
+        assert permission is github.GithubObject.NotSet or isinstance(permission, (str, unicode)), permission
         post_parameters = {
             "name": name,
         }
-        if repo_names is not GithubObject.NotSet:
+        if repo_names is not github.GithubObject.NotSet:
             post_parameters["repo_names"] = [element._identity for element in repo_names]
-        if permission is not GithubObject.NotSet:
+        if permission is not github.GithubObject.NotSet:
             post_parameters["permission"] = permission
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "POST",
             self.url + "/teams",
             None,
             post_parameters
         )
-        return Team.Team(self._requester, data, completed=True)
+        return github.Team.Team(self._requester, data, completed=True)
 
-    def edit(self, billing_email=GithubObject.NotSet, blog=GithubObject.NotSet, company=GithubObject.NotSet, email=GithubObject.NotSet, location=GithubObject.NotSet, name=GithubObject.NotSet):
-        assert billing_email is GithubObject.NotSet or isinstance(billing_email, (str, unicode)), billing_email
-        assert blog is GithubObject.NotSet or isinstance(blog, (str, unicode)), blog
-        assert company is GithubObject.NotSet or isinstance(company, (str, unicode)), company
-        assert email is GithubObject.NotSet or isinstance(email, (str, unicode)), email
-        assert location is GithubObject.NotSet or isinstance(location, (str, unicode)), location
-        assert name is GithubObject.NotSet or isinstance(name, (str, unicode)), name
+    def edit(self, billing_email=github.GithubObject.NotSet, blog=github.GithubObject.NotSet, company=github.GithubObject.NotSet, email=github.GithubObject.NotSet, location=github.GithubObject.NotSet, name=github.GithubObject.NotSet):
+        """
+        :calls: `PATCH /orgs/:org <http://developer.github.com/v3/todo>`_
+        :param billing_email: string
+        :param blog: string
+        :param company: string
+        :param email: string
+        :param location: string
+        :param name: string
+        :rtype: None
+        """
+        assert billing_email is github.GithubObject.NotSet or isinstance(billing_email, (str, unicode)), billing_email
+        assert blog is github.GithubObject.NotSet or isinstance(blog, (str, unicode)), blog
+        assert company is github.GithubObject.NotSet or isinstance(company, (str, unicode)), company
+        assert email is github.GithubObject.NotSet or isinstance(email, (str, unicode)), email
+        assert location is github.GithubObject.NotSet or isinstance(location, (str, unicode)), location
+        assert name is github.GithubObject.NotSet or isinstance(name, (str, unicode)), name
         post_parameters = dict()
-        if billing_email is not GithubObject.NotSet:
+        if billing_email is not github.GithubObject.NotSet:
             post_parameters["billing_email"] = billing_email
-        if blog is not GithubObject.NotSet:
+        if blog is not github.GithubObject.NotSet:
             post_parameters["blog"] = blog
-        if company is not GithubObject.NotSet:
+        if company is not github.GithubObject.NotSet:
             post_parameters["company"] = company
-        if email is not GithubObject.NotSet:
+        if email is not github.GithubObject.NotSet:
             post_parameters["email"] = email
-        if location is not GithubObject.NotSet:
+        if location is not github.GithubObject.NotSet:
             post_parameters["location"] = location
-        if name is not GithubObject.NotSet:
+        if name is not github.GithubObject.NotSet:
             post_parameters["name"] = name
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "PATCH",
             self.url,
             None,
@@ -254,72 +371,108 @@ class Organization(GithubObject.GithubObject):
         self._useAttributes(data)
 
     def get_events(self):
-        return PaginatedList.PaginatedList(
-            Event.Event,
+        """
+        :calls: `GET /orgs/:org/events <http://developer.github.com/v3/todo>`_
+        :rtype: :class:`github.PaginatedList.PaginatedList` of :class:`github.Event.Event`
+        """
+        return github.PaginatedList.PaginatedList(
+            github.Event.Event,
             self._requester,
             self.url + "/events",
             None
         )
 
     def get_members(self):
-        return PaginatedList.PaginatedList(
-            NamedUser.NamedUser,
+        """
+        :calls: `GET /orgs/:org/members <http://developer.github.com/v3/todo>`_
+        :rtype: :class:`github.PaginatedList.PaginatedList` of :class:`github.NamedUser.NamedUser`
+        """
+        return github.PaginatedList.PaginatedList(
+            github.NamedUser.NamedUser,
             self._requester,
             self.url + "/members",
             None
         )
 
     def get_public_members(self):
-        return PaginatedList.PaginatedList(
-            NamedUser.NamedUser,
+        """
+        :calls: `GET /orgs/:org/public_members <http://developer.github.com/v3/todo>`_
+        :rtype: :class:`github.PaginatedList.PaginatedList` of :class:`github.NamedUser.NamedUser`
+        """
+        return github.PaginatedList.PaginatedList(
+            github.NamedUser.NamedUser,
             self._requester,
             self.url + "/public_members",
             None
         )
 
     def get_repo(self, name):
+        """
+        :calls: `GET /repos/:user/:repo <http://developer.github.com/v3/todo>`_
+        :param name: string
+        :rtype: :class:`github.Repository.Repository`
+        """
         assert isinstance(name, (str, unicode)), name
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "GET",
             "/repos/" + self.login + "/" + name,
             None,
             None
         )
-        return Repository.Repository(self._requester, data, completed=True)
+        return github.Repository.Repository(self._requester, data, completed=True)
 
-    def get_repos(self, type=GithubObject.NotSet):
-        assert type is GithubObject.NotSet or isinstance(type, (str, unicode)), type
+    def get_repos(self, type=github.GithubObject.NotSet):
+        """
+        :calls: `GET /orgs/:org/repos <http://developer.github.com/v3/todo>`_
+        :param type: string
+        :rtype: :class:`github.PaginatedList.PaginatedList` of :class:`github.Repository.Repository`
+        """
+        assert type is github.GithubObject.NotSet or isinstance(type, (str, unicode)), type
         url_parameters = dict()
-        if type is not GithubObject.NotSet:
+        if type is not github.GithubObject.NotSet:
             url_parameters["type"] = type
-        return PaginatedList.PaginatedList(
-            Repository.Repository,
+        return github.PaginatedList.PaginatedList(
+            github.Repository.Repository,
             self._requester,
             self.url + "/repos",
             url_parameters
         )
 
     def get_team(self, id):
+        """
+        :calls: `GET /teams/:id <http://developer.github.com/v3/todo>`_
+        :param id: integer
+        :rtype: :class:`github.Team.Team`
+        """
         assert isinstance(id, (int, long)), id
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "GET",
             "/teams/" + str(id),
             None,
             None
         )
-        return Team.Team(self._requester, data, completed=True)
+        return github.Team.Team(self._requester, data, completed=True)
 
     def get_teams(self):
-        return PaginatedList.PaginatedList(
-            Team.Team,
+        """
+        :calls: `GET /orgs/:org/teams <http://developer.github.com/v3/todo>`_
+        :rtype: :class:`github.PaginatedList.PaginatedList` of :class:`github.Team.Team`
+        """
+        return github.PaginatedList.PaginatedList(
+            github.Team.Team,
             self._requester,
             self.url + "/teams",
             None
         )
 
     def has_in_members(self, member):
-        assert isinstance(member, NamedUser.NamedUser), member
-        status, headers, data = self._requester.requestRaw(
+        """
+        :calls: `GET /orgs/:org/members/:user <http://developer.github.com/v3/todo>`_
+        :param member: :class:`github.NamedUser.NamedUser`
+        :rtype: bool
+        """
+        assert isinstance(member, github.NamedUser.NamedUser), member
+        status, headers, data = self._requester.requestJson(
             "GET",
             self.url + "/members/" + member._identity,
             None,
@@ -328,8 +481,13 @@ class Organization(GithubObject.GithubObject):
         return status == 204
 
     def has_in_public_members(self, public_member):
-        assert isinstance(public_member, NamedUser.NamedUser), public_member
-        status, headers, data = self._requester.requestRaw(
+        """
+        :calls: `GET /orgs/:org/public_members/:user <http://developer.github.com/v3/todo>`_
+        :param public_member: :class:`github.NamedUser.NamedUser`
+        :rtype: bool
+        """
+        assert isinstance(public_member, github.NamedUser.NamedUser), public_member
+        status, headers, data = self._requester.requestJson(
             "GET",
             self.url + "/public_members/" + public_member._identity,
             None,
@@ -338,8 +496,13 @@ class Organization(GithubObject.GithubObject):
         return status == 204
 
     def remove_from_members(self, member):
-        assert isinstance(member, NamedUser.NamedUser), member
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `DELETE /orgs/:org/members/:user <http://developer.github.com/v3/todo>`_
+        :param member: :class:`github.NamedUser.NamedUser`
+        :rtype: None
+        """
+        assert isinstance(member, github.NamedUser.NamedUser), member
+        headers, data = self._requester.requestJsonAndCheck(
             "DELETE",
             self.url + "/members/" + member._identity,
             None,
@@ -347,8 +510,13 @@ class Organization(GithubObject.GithubObject):
         )
 
     def remove_from_public_members(self, public_member):
-        assert isinstance(public_member, NamedUser.NamedUser), public_member
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `DELETE /orgs/:org/public_members/:user <http://developer.github.com/v3/todo>`_
+        :param public_member: :class:`github.NamedUser.NamedUser`
+        :rtype: None
+        """
+        assert isinstance(public_member, github.NamedUser.NamedUser), public_member
+        headers, data = self._requester.requestJsonAndCheck(
             "DELETE",
             self.url + "/public_members/" + public_member._identity,
             None,
@@ -356,30 +524,30 @@ class Organization(GithubObject.GithubObject):
         )
 
     def _initAttributes(self):
-        self._avatar_url = GithubObject.NotSet
-        self._billing_email = GithubObject.NotSet
-        self._blog = GithubObject.NotSet
-        self._collaborators = GithubObject.NotSet
-        self._company = GithubObject.NotSet
-        self._created_at = GithubObject.NotSet
-        self._disk_usage = GithubObject.NotSet
-        self._email = GithubObject.NotSet
-        self._followers = GithubObject.NotSet
-        self._following = GithubObject.NotSet
-        self._gravatar_id = GithubObject.NotSet
-        self._html_url = GithubObject.NotSet
-        self._id = GithubObject.NotSet
-        self._location = GithubObject.NotSet
-        self._login = GithubObject.NotSet
-        self._name = GithubObject.NotSet
-        self._owned_private_repos = GithubObject.NotSet
-        self._plan = GithubObject.NotSet
-        self._private_gists = GithubObject.NotSet
-        self._public_gists = GithubObject.NotSet
-        self._public_repos = GithubObject.NotSet
-        self._total_private_repos = GithubObject.NotSet
-        self._type = GithubObject.NotSet
-        self._url = GithubObject.NotSet
+        self._avatar_url = github.GithubObject.NotSet
+        self._billing_email = github.GithubObject.NotSet
+        self._blog = github.GithubObject.NotSet
+        self._collaborators = github.GithubObject.NotSet
+        self._company = github.GithubObject.NotSet
+        self._created_at = github.GithubObject.NotSet
+        self._disk_usage = github.GithubObject.NotSet
+        self._email = github.GithubObject.NotSet
+        self._followers = github.GithubObject.NotSet
+        self._following = github.GithubObject.NotSet
+        self._gravatar_id = github.GithubObject.NotSet
+        self._html_url = github.GithubObject.NotSet
+        self._id = github.GithubObject.NotSet
+        self._location = github.GithubObject.NotSet
+        self._login = github.GithubObject.NotSet
+        self._name = github.GithubObject.NotSet
+        self._owned_private_repos = github.GithubObject.NotSet
+        self._plan = github.GithubObject.NotSet
+        self._private_gists = github.GithubObject.NotSet
+        self._public_gists = github.GithubObject.NotSet
+        self._public_repos = github.GithubObject.NotSet
+        self._total_private_repos = github.GithubObject.NotSet
+        self._type = github.GithubObject.NotSet
+        self._url = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "avatar_url" in attributes:  # pragma no branch
@@ -435,7 +603,7 @@ class Organization(GithubObject.GithubObject):
             self._owned_private_repos = attributes["owned_private_repos"]
         if "plan" in attributes:  # pragma no branch
             assert attributes["plan"] is None or isinstance(attributes["plan"], dict), attributes["plan"]
-            self._plan = None if attributes["plan"] is None else Plan.Plan(self._requester, attributes["plan"], completed=False)
+            self._plan = None if attributes["plan"] is None else github.Plan.Plan(self._requester, attributes["plan"], completed=False)
         if "private_gists" in attributes:  # pragma no branch
             assert attributes["private_gists"] is None or isinstance(attributes["private_gists"], (int, long)), attributes["private_gists"]
             self._private_gists = attributes["private_gists"]

@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -15,12 +15,12 @@
 
 import urlparse
 
-from PaginatedList import PaginatedListBase
+import github.PaginatedList
 
 
-class PaginatedList(PaginatedListBase):
+class PaginatedList(github.PaginatedList.PaginatedListBase):
     def __init__(self, url, args, requester, key, convert, contentClass):
-        PaginatedListBase.__init__(self)
+        github.PaginatedList.PaginatedListBase.__init__(self)
         self.__url = url
         self.__args = args
         self.__requester = requester
@@ -43,7 +43,7 @@ class PaginatedList(PaginatedListBase):
         args = dict(self.__args)
         if page != 0:
             args["start_page"] = page + 1
-        headers, data = self.__requester.requestAndCheck(
+        headers, data = self.__requester.requestJsonAndCheck(
             "GET",
             self.__url,
             args,

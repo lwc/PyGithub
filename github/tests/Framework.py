@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -20,6 +20,22 @@ import httplib
 import traceback
 
 import github
+
+atLeastPython26 = sys.hexversion >= 0x02060000
+atLeastPython3 = sys.hexversion >= 0x03000000
+atMostPython32 = sys.hexversion < 0x03030000
+
+if atLeastPython26:
+    import json
+else:  # pragma no cover
+    import simplejson as json  # pragma no cover
+
+
+def readLine(file):
+    if atLeastPython3:
+        return file.readline().decode("utf-8").strip()
+    else:
+        return file.readline().strip()
 
 
 class FakeHttpResponse:
@@ -57,7 +73,13 @@ class RecordingConnection:  # pragma no cover
         print verb, url, input, headers,
         self.__cnx.request(verb, url, input, headers)
         fixAuthorizationHeader(headers)
-        self.__file.write(self.__protocol + " " + verb + " " + self.__host + " " + self.__port + " " + url + " " + str(headers) + " " + input + "\n")
+        self.__writeLine(self.__protocol)
+        self.__writeLine(verb)
+        self.__writeLine(self.__host)
+        self.__writeLine(self.__port)
+        self.__writeLine(url)
+        self.__writeLine(str(headers))
+        self.__writeLine(input.replace('\n', '').replace('\r', ''))
 
     def getresponse(self):
         res = self.__cnx.getresponse()
@@ -67,15 +89,18 @@ class RecordingConnection:  # pragma no cover
         headers = res.getheaders()
         output = res.read()
 
-        self.__file.write(str(status) + "\n")
-        self.__file.write(str(headers) + "\n")
-        self.__file.write(str(output) + "\n")
+        self.__writeLine(str(status))
+        self.__writeLine(str(headers))
+        self.__writeLine(str(output))
 
         return FakeHttpResponse(status, headers, output)
 
     def close(self):
-        self.__file.write("\n")
+        self.__writeLine("")
         return self.__cnx.close()
+
+    def __writeLine(self, line):
+        self.__file.write(line + "\n")
 
 
 class RecordingHttpConnection(RecordingConnection):  # pragma no cover
@@ -89,7 +114,6 @@ class RecordingHttpsConnection(RecordingConnection):  # pragma no cover
     _realConnection = httplib.HTTPSConnection
 
     def __init__(self, file, *args, **kwds):
-        print args, kwds
         RecordingConnection.__init__(self, file, "https", *args, **kwds)
 
 
@@ -103,18 +127,37 @@ class ReplayingConnection:
 
     def request(self, verb, url, input, headers):
         fixAuthorizationHeader(headers)
-        expectation = self.__file.readline().strip()
-        self.__testCase.assertEqual(self.__protocol + " " + verb + " " + self.__host + " " + self.__port + " " + url + " " + str(headers) + " " + input, expectation)
+        self.__testCase.assertEqual(self.__protocol, readLine(self.__file))
+        self.__testCase.assertEqual(verb, readLine(self.__file))
+        self.__testCase.assertEqual(self.__host, readLine(self.__file))
+        self.__testCase.assertEqual(self.__port, readLine(self.__file))
+        self.__testCase.assertEqual(self.__splitUrl(url), self.__splitUrl(readLine(self.__file)))
+        self.__testCase.assertEqual(headers, eval(readLine(self.__file)))
+        expectedInput = readLine(self.__file)
+        if input.startswith("{"):
+            self.__testCase.assertEqual(json.loads(input.replace('\n', '').replace('\r', '')), json.loads(expectedInput))
+        elif atMostPython32:  # @todo Test in all cases, including Python 3.3
+            # In Python 3.3, dicts are not output in the same order as in Python 2.5 -> 3.2.
+            # So, form-data encoding is not deterministic and is difficult to test.
+            self.__testCase.assertEqual(input.replace('\n', '').replace('\r', ''), expectedInput)
+
+    def __splitUrl(self, url):
+        splitedUrl = url.split("?")
+        if len(splitedUrl) == 1:
+            return splitedUrl
+        self.__testCase.assertEqual(len(splitedUrl), 2)
+        base, qs = splitedUrl
+        return (base, sorted(qs.split("&")))
 
     def getresponse(self):
-        status = int(self.__file.readline().strip())
-        headers = eval(self.__file.readline().strip())
-        output = self.__file.readline().strip()
+        status = int(readLine(self.__file))
+        headers = eval(readLine(self.__file))
+        output = readLine(self.__file)
 
         return FakeHttpResponse(status, headers, output)
 
     def close(self):
-        self.__file.readline()
+        readLine(self.__file)
 
 
 def ReplayingHttpConnection(testCase, file, *args, **kwds):
@@ -146,8 +189,8 @@ class BasicTestCase(unittest.TestCase):
             # self.client_secret = GithubCredentials.client_secret
         else:
             github.Requester.Requester.injectConnectionClasses(
-                lambda ignored, *args, **kwds: ReplayingHttpConnection(self, self.__openFile("r"), *args, **kwds),
-                lambda ignored, *args, **kwds: ReplayingHttpsConnection(self, self.__openFile("r"), *args, **kwds)
+                lambda ignored, *args, **kwds: ReplayingHttpConnection(self, self.__openFile("rb"), *args, **kwds),
+                lambda ignored, *args, **kwds: ReplayingHttpsConnection(self, self.__openFile("rb"), *args, **kwds)
             )
             self.login = "login"
             self.password = "password"
@@ -158,6 +201,7 @@ class BasicTestCase(unittest.TestCase):
     def tearDown(self):
         unittest.TestCase.tearDown(self)
         self.__closeReplayFileIfNeeded()
+        github.Requester.Requester.resetConnectionClasses()
 
     def __openFile(self, mode):
         for (_, _, functionName, _) in traceback.extract_stack():
@@ -173,7 +217,7 @@ class BasicTestCase(unittest.TestCase):
     def __closeReplayFileIfNeeded(self):
         if self.__file is not None:
             if not self.recordMode:  # pragma no branch
-                self.assertEqual(self.__file.readline(), "")
+                self.assertEqual(readLine(self.__file), "")
             self.__file.close()
 
     def assertListKeyEqual(self, elements, key, expectedKeys):

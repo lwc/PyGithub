@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -21,6 +21,7 @@ import urlparse
 import sys
 
 atLeastPython26 = sys.hexversion >= 0x02060000
+atLeastPython3 = sys.hexversion >= 0x03000000
 
 if atLeastPython26:
     import json
@@ -39,10 +40,18 @@ class Requester:
         cls.__httpConnectionClass = httpConnectionClass
         cls.__httpsConnectionClass = httpsConnectionClass
 
-    def __init__(self, login_or_token, password, base_url, timeout, client_id, client_secret, user_agent):
+    @classmethod
+    def resetConnectionClasses(cls):
+        cls.__httpConnectionClass = httplib.HTTPConnection
+        cls.__httpsConnectionClass = httplib.HTTPSConnection
+
+    def __init__(self, login_or_token, password, base_url, timeout, client_id, client_secret, user_agent, per_page):
         if password is not None:
             login = login_or_token
-            self.__authorizationHeader = "Basic " + base64.b64encode(login + ":" + password).replace('\n', '')
+            if atLeastPython3:
+                self.__authorizationHeader = "Basic " + base64.b64encode((login + ":" + password).encode("utf-8")).decode("utf-8").replace('\n', '')  # pragma no cover
+            else:
+                self.__authorizationHeader = "Basic " + base64.b64encode(login + ":" + password).replace('\n', '')
         elif login_or_token is not None:
             token = login_or_token
             self.__authorizationHeader = "token " + token
@@ -64,25 +73,57 @@ class Requester:
             assert False, "Unknown URL scheme"  # pragma no cover
         self.rate_limiting = (5000, 5000)
         self.FIX_REPO_GET_GIT_REF = True
+        self.per_page = per_page
+
+        self.oauth_scopes = None
 
         self.__clientId = client_id
         self.__clientSecret = client_secret
         self.__userAgent = user_agent
 
-    def requestAndCheck(self, verb, url, parameters, input):
-        status, headers, output = self.requestRaw(verb, url, parameters, input)
+    def requestJsonAndCheck(self, verb, url, parameters, input):
+        return self.__check(*self.requestJson(verb, url, parameters, input))
+
+    def requestMultipartAndCheck(self, verb, url, parameters, input):
+        return self.__check(*self.requestMultipart(verb, url, parameters, input))
+
+    def __check(self, status, responseHeaders, output):
         output = self.__structuredFromJson(output)
         if status >= 400:
             raise GithubException.GithubException(status, output)
-        return headers, output
+        return responseHeaders, output
 
     def __structuredFromJson(self, data):
         if len(data) == 0:
             return None
         else:
+            if atLeastPython3 and isinstance(data, bytes):  # pragma no branch
+                data = data.decode("utf-8")  # pragma no cover
             return json.loads(data)
 
-    def requestRaw(self, verb, url, parameters, input):
+    def requestJson(self, verb, url, parameters, input):
+        def encode(input):
+            return "application/json", json.dumps(input)
+
+        return self.__requestEncode(verb, url, parameters, input, encode)
+
+    def requestMultipart(self, verb, url, parameters, input):
+        def encode(input):
+            boundary = "----------------------------3c3ba8b523b2"
+            eol = "\r\n"
+
+            encoded_input = ""
+            for name, value in input.iteritems():
+                encoded_input += "--" + boundary + eol
+                encoded_input += "Content-Disposition: form-data; name=\"" + name + "\"" + eol
+                encoded_input += eol
+                encoded_input += value + eol
+            encoded_input += "--" + boundary + "--" + eol
+            return "multipart/form-data; boundary=" + boundary, encoded_input
+
+        return self.__requestEncode(verb, url, parameters, input, encode)
+
+    def __requestEncode(self, verb, url, parameters, input, encode):
         assert verb in ["HEAD", "GET", "POST", "PATCH", "PUT", "DELETE"]
         if parameters is None:
             parameters = dict()
@@ -95,14 +136,26 @@ class Requester:
         url = self.__makeAbsoluteUrl(url)
         url = self.__addParametersToUrl(url, parameters)
 
+        encoded_input = "null"
         if input is not None:
-            requestHeaders["Content-Type"] = "application/json"
+            requestHeaders["Content-Type"], encoded_input = encode(input)
 
+        status, responseHeaders, output = self.__requestRaw(verb, url, requestHeaders, encoded_input)
+
+        if "x-ratelimit-remaining" in responseHeaders and "x-ratelimit-limit" in responseHeaders:
+            self.rate_limiting = (int(responseHeaders["x-ratelimit-remaining"]), int(responseHeaders["x-ratelimit-limit"]))
+
+        if "x-oauth-scopes" in responseHeaders:
+            self.oauth_scopes = responseHeaders["x-oauth-scopes"].split(", ")
+
+        return status, responseHeaders, output
+
+    def __requestRaw(self, verb, url, requestHeaders, input):
         cnx = self.__createConnection()
         cnx.request(
             verb,
             url,
-            json.dumps(input),
+            input,
             requestHeaders
         )
         response = cnx.getresponse()
@@ -112,9 +165,6 @@ class Requester:
         output = response.read()
 
         cnx.close()
-
-        if "x-ratelimit-remaining" in responseHeaders and "x-ratelimit-limit" in responseHeaders:
-            self.rate_limiting = (int(responseHeaders["x-ratelimit-remaining"]), int(responseHeaders["x-ratelimit-limit"]))
 
         self.__log(verb, url, requestHeaders, input, status, responseHeaders, output)
 
@@ -150,10 +200,12 @@ class Requester:
             return url + "?" + urllib.urlencode(parameters)
 
     def __createConnection(self):
-        if atLeastPython26:
-            return self.__connectionClass(host=self.__hostname, port=self.__port, strict=True, timeout=self.__timeout)
-        else:  # pragma no cover
-            return self.__connectionClass(host=self.__hostname, port=self.__port, strict=True)  # pragma no cover
+        kwds = {}
+        if not atLeastPython3:  # pragma no branch
+            kwds["strict"] = True  # Useless in Python3, would generate a deprecation warning
+        if atLeastPython26:  # pragma no branch
+            kwds["timeout"] = self.__timeout  # Did not exist before Python2.6
+        return self.__connectionClass(host=self.__hostname, port=self.__port, **kwds)
 
     def __log(self, verb, url, requestHeaders, input, status, responseHeaders, output):
         logger = logging.getLogger(__name__)

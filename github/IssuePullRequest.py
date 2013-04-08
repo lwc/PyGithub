@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,26 +13,39 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class IssuePullRequest(GithubObject.BasicGithubObject):
+class IssuePullRequest(github.GithubObject.NonCompletableGithubObject):
+    """
+    This class represents IssuePullRequests as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def diff_url(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._diff_url)
 
     @property
     def html_url(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._html_url)
 
     @property
     def patch_url(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._patch_url)
 
     def _initAttributes(self):
-        self._diff_url = GithubObject.NotSet
-        self._html_url = GithubObject.NotSet
-        self._patch_url = GithubObject.NotSet
+        self._diff_url = github.GithubObject.NotSet
+        self._html_url = github.GithubObject.NotSet
+        self._patch_url = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "diff_url" in attributes:  # pragma no branch

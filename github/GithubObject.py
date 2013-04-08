@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,15 +19,31 @@ import GithubException
 
 
 class _NotSetType:
-    pass
+    def __repr__(self):
+        return "NotSet"  # pragma no cover
 NotSet = _NotSetType()
 
 
-class BasicGithubObject(object):
-    def __init__(self, requester, attributes, completed):  # 'completed' may be removed if I find a way
+class GithubObject(object):
+    """
+    Base class for all classes representing objects returned by the API.
+    """
+    def __init__(self, requester, attributes, completed):
         self._requester = requester
         self._initAttributes()
+        self._storeAndUseAttributes(attributes)
+
+    def _storeAndUseAttributes(self, attributes):
         self._useAttributes(attributes)
+        self._rawData = attributes
+
+    @property
+    def raw_data(self):
+        """
+        :type: dict
+        """
+        self._completeIfNeeded()
+        return self._rawData
 
     @staticmethod
     def _parentUrl(url):
@@ -52,21 +68,30 @@ class BasicGithubObject(object):
             return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ")
 
 
-class GithubObject(BasicGithubObject):
+class NonCompletableGithubObject(GithubObject):
+    def _completeIfNeeded(self):
+        pass
+
+
+class CompletableGithubObject(GithubObject):
     def __init__(self, requester, attributes, completed):
-        BasicGithubObject.__init__(self, requester, attributes, completed)
+        GithubObject.__init__(self, requester, attributes, completed)
         self.__completed = completed
 
     def _completeIfNotSet(self, value):
-        if not self.__completed and value is NotSet:
+        if value is NotSet:
+            self._completeIfNeeded()
+
+    def _completeIfNeeded(self):
+        if not self.__completed:
             self.__complete()
 
     def __complete(self):
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "GET",
             self._url,
             None,
             None
         )
-        self._useAttributes(data)
-        self._completed = True
+        self._storeAndUseAttributes(data)
+        self.__completed = True

@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,31 +13,47 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class HookDescription(GithubObject.BasicGithubObject):
+class HookDescription(github.GithubObject.NonCompletableGithubObject):
+    """
+    This class represents HookDescriptions as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def events(self):
+        """
+        :type: list of string
+        """
         return self._NoneIfNotSet(self._events)
 
     @property
     def name(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._name)
 
     @property
     def schema(self):
+        """
+        :type: list of list of string
+        """
         return self._NoneIfNotSet(self._schema)
 
     @property
     def supported_events(self):
+        """
+        :type: list of string
+        """
         return self._NoneIfNotSet(self._supported_events)
 
     def _initAttributes(self):
-        self._events = GithubObject.NotSet
-        self._name = GithubObject.NotSet
-        self._schema = GithubObject.NotSet
-        self._supported_events = GithubObject.NotSet
+        self._events = github.GithubObject.NotSet
+        self._name = github.GithubObject.NotSet
+        self._schema = github.GithubObject.NotSet
+        self._supported_events = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "events" in attributes:  # pragma no branch

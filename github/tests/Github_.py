@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -31,15 +31,15 @@ class Github(Framework.TestCase):
         self.assertEqual(repos[1].created_at, datetime.datetime(2011, 6, 23, 22, 52, 33))
         self.assertEqual(repos[1].name, "github-v3-api")
         self.assertEqual(repos[1].watchers, 35)
-        self.assertEqual(repos[1].has_downloads, True)
+        self.assertTrue(repos[1].has_downloads)
         self.assertEqual(repos[3].homepage, "http://peter-murach.github.com/github")
         self.assertEqual(repos[1].url, "/repos/jwilger/github-v3-api")
-        self.assertEqual(repos[1].fork, False)
-        self.assertEqual(repos[1].has_issues, True)
-        self.assertEqual(repos[1].has_wiki, False)
+        self.assertFalse(repos[1].fork)
+        self.assertTrue(repos[1].has_issues)
+        self.assertFalse(repos[1].has_wiki)
         self.assertEqual(repos[1].forks, 13)
         self.assertEqual(repos[1].size, 212)
-        self.assertEqual(repos[1].private, False)
+        self.assertFalse(repos[1].private)
         self.assertEqual(repos[1].open_issues, 2)
         self.assertEqual(repos[3].pushed_at, datetime.datetime(2012, 6, 28, 21, 26, 31))
         self.assertEqual(repos[1].description, "Ruby Client for the GitHub v3 API")
@@ -92,3 +92,18 @@ class Github(Framework.TestCase):
         self.assertEqual(hook.supported_events, ["push"])
         self.assertEqual(hook.events, ["push"])
         self.assertEqual(hook.schema, [["string", "url"], ["string", "token"], ["string", "project_id"], ["string", "milestone_id"], ["string", "category_id"]])
+
+    def testGetRepoFromFullName(self):
+        self.assertEqual(self.g.get_repo("jacquev6/PyGithub").description, "Python library implementing the full Github API v3")
+
+    def testGetGitignoreTemplates(self):
+        self.assertEqual(self.g.get_gitignore_templates(), ["Actionscript", "Android", "AppceleratorTitanium", "Autotools", "Bancha", "C", "C++", "CFWheels", "CMake", "CSharp", "CakePHP", "Clojure", "CodeIgniter", "Compass", "Concrete5", "Coq", "Delphi", "Django", "Drupal", "Erlang", "ExpressionEngine", "Finale", "ForceDotCom", "FuelPHP", "GWT", "Go", "Grails", "Haskell", "Java", "Jboss", "Jekyll", "Joomla", "Jython", "Kohana", "LaTeX", "Leiningen", "LemonStand", "Lilypond", "Lithium", "Magento", "Maven", "Node", "OCaml", "Objective-C", "Opa", "OracleForms", "Perl", "PlayFramework", "Python", "Qooxdoo", "Qt", "R", "Rails", "RhodesRhomobile", "Ruby", "Scala", "Sdcc", "SeamGen", "SketchUp", "SugarCRM", "Symfony", "Symfony2", "SymphonyCMS", "Target3001", "Tasm", "Textpattern", "TurboGears2", "Unity", "VB.Net", "Waf", "Wordpress", "Yii", "ZendFramework", "gcov", "nanoc", "opencart"])
+
+    def testGetGitignoreTemplate(self):
+        t = self.g.get_gitignore_template("Python")
+        self.assertEqual(t.name, "Python")
+        self.assertEqual(t.source, "*.py[cod]\n\n# C extensions\n*.so\n\n# Packages\n*.egg\n*.egg-info\ndist\nbuild\neggs\nparts\nbin\nvar\nsdist\ndevelop-eggs\n.installed.cfg\nlib\nlib64\n\n# Installer logs\npip-log.txt\n\n# Unit test / coverage reports\n.coverage\n.tox\nnosetests.xml\n\n# Translations\n*.mo\n\n# Mr Developer\n.mr.developer.cfg\n.project\n.pydevproject\n")
+
+        t = self.g.get_gitignore_template("C++")
+        self.assertEqual(t.name, "C++")
+        self.assertEqual(t.source, "# Compiled Object files\n*.slo\n*.lo\n*.o\n\n# Compiled Dynamic libraries\n*.so\n*.dylib\n\n# Compiled Static libraries\n*.lai\n*.la\n*.a\n")

@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,36 +13,55 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class GistFile(GithubObject.BasicGithubObject):
+class GistFile(github.GithubObject.NonCompletableGithubObject):
+    """
+    This class represents GistFiles as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def content(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._content)
 
     @property
     def filename(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._filename)
 
     @property
     def language(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._language)
 
     @property
     def raw_url(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._raw_url)
 
     @property
     def size(self):
+        """
+        :type: integer
+        """
         return self._NoneIfNotSet(self._size)
 
     def _initAttributes(self):
-        self._content = GithubObject.NotSet
-        self._filename = GithubObject.NotSet
-        self._language = GithubObject.NotSet
-        self._raw_url = GithubObject.NotSet
-        self._size = GithubObject.NotSet
+        self._content = github.GithubObject.NotSet
+        self._filename = github.GithubObject.NotSet
+        self._language = github.GithubObject.NotSet
+        self._raw_url = github.GithubObject.NotSet
+        self._size = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "content" in attributes:  # pragma no branch

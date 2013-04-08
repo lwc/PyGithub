@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,85 +13,130 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
-import HookResponse
+import github.HookResponse
 
 
-class Hook(GithubObject.GithubObject):
+class Hook(github.GithubObject.CompletableGithubObject):
+    """
+    This class represents Hooks as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def active(self):
+        """
+        :type: bool
+        """
         self._completeIfNotSet(self._active)
         return self._NoneIfNotSet(self._active)
 
     @property
     def config(self):
+        """
+        :type: dict
+        """
         self._completeIfNotSet(self._config)
         return self._NoneIfNotSet(self._config)
 
     @property
     def created_at(self):
+        """
+        :type: datetime.datetime
+        """
         self._completeIfNotSet(self._created_at)
         return self._NoneIfNotSet(self._created_at)
 
     @property
     def events(self):
+        """
+        :type: list of string
+        """
         self._completeIfNotSet(self._events)
         return self._NoneIfNotSet(self._events)
 
     @property
     def id(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._id)
         return self._NoneIfNotSet(self._id)
 
     @property
     def last_response(self):
+        """
+        :type: :class:`github.HookResponse.HookResponse`
+        """
         self._completeIfNotSet(self._last_response)
         return self._NoneIfNotSet(self._last_response)
 
     @property
     def name(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._name)
         return self._NoneIfNotSet(self._name)
 
     @property
     def updated_at(self):
+        """
+        :type: datetime.datetime
+        """
         self._completeIfNotSet(self._updated_at)
         return self._NoneIfNotSet(self._updated_at)
 
     @property
     def url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._url)
         return self._NoneIfNotSet(self._url)
 
     def delete(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `DELETE /repos/:user/:repo/hooks/:id <http://developer.github.com/v3/todo>`_
+        :rtype: None
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "DELETE",
             self.url,
             None,
             None
         )
 
-    def edit(self, name, config, events=GithubObject.NotSet, add_events=GithubObject.NotSet, remove_events=GithubObject.NotSet, active=GithubObject.NotSet):
+    def edit(self, name, config, events=github.GithubObject.NotSet, add_events=github.GithubObject.NotSet, remove_events=github.GithubObject.NotSet, active=github.GithubObject.NotSet):
+        """
+        :calls: `PATCH /repos/:user/:repo/hooks/:id <http://developer.github.com/v3/todo>`_
+        :param name: string
+        :param config: dict
+        :param events: list of string
+        :param add_events: list of string
+        :param remove_events: list of string
+        :param active: bool
+        :rtype: None
+        """
         assert isinstance(name, (str, unicode)), name
         assert isinstance(config, dict), config
-        assert events is GithubObject.NotSet or all(isinstance(element, (str, unicode)) for element in events), events
-        assert add_events is GithubObject.NotSet or all(isinstance(element, (str, unicode)) for element in add_events), add_events
-        assert remove_events is GithubObject.NotSet or all(isinstance(element, (str, unicode)) for element in remove_events), remove_events
-        assert active is GithubObject.NotSet or isinstance(active, bool), active
+        assert events is github.GithubObject.NotSet or all(isinstance(element, (str, unicode)) for element in events), events
+        assert add_events is github.GithubObject.NotSet or all(isinstance(element, (str, unicode)) for element in add_events), add_events
+        assert remove_events is github.GithubObject.NotSet or all(isinstance(element, (str, unicode)) for element in remove_events), remove_events
+        assert active is github.GithubObject.NotSet or isinstance(active, bool), active
         post_parameters = {
             "name": name,
             "config": config,
         }
-        if events is not GithubObject.NotSet:
+        if events is not github.GithubObject.NotSet:
             post_parameters["events"] = events
-        if add_events is not GithubObject.NotSet:
+        if add_events is not github.GithubObject.NotSet:
             post_parameters["add_events"] = add_events
-        if remove_events is not GithubObject.NotSet:
+        if remove_events is not github.GithubObject.NotSet:
             post_parameters["remove_events"] = remove_events
-        if active is not GithubObject.NotSet:
+        if active is not github.GithubObject.NotSet:
             post_parameters["active"] = active
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "PATCH",
             self.url,
             None,
@@ -100,7 +145,11 @@ class Hook(GithubObject.GithubObject):
         self._useAttributes(data)
 
     def test(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `POST /repos/:user/:repo/hooks/:id/test <http://developer.github.com/v3/todo>`_
+        :rtype: None
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "POST",
             self.url + "/test",
             None,
@@ -108,15 +157,15 @@ class Hook(GithubObject.GithubObject):
         )
 
     def _initAttributes(self):
-        self._active = GithubObject.NotSet
-        self._config = GithubObject.NotSet
-        self._created_at = GithubObject.NotSet
-        self._events = GithubObject.NotSet
-        self._id = GithubObject.NotSet
-        self._last_response = GithubObject.NotSet
-        self._name = GithubObject.NotSet
-        self._updated_at = GithubObject.NotSet
-        self._url = GithubObject.NotSet
+        self._active = github.GithubObject.NotSet
+        self._config = github.GithubObject.NotSet
+        self._created_at = github.GithubObject.NotSet
+        self._events = github.GithubObject.NotSet
+        self._id = github.GithubObject.NotSet
+        self._last_response = github.GithubObject.NotSet
+        self._name = github.GithubObject.NotSet
+        self._updated_at = github.GithubObject.NotSet
+        self._url = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "active" in attributes:  # pragma no branch
@@ -136,7 +185,7 @@ class Hook(GithubObject.GithubObject):
             self._id = attributes["id"]
         if "last_response" in attributes:  # pragma no branch
             assert attributes["last_response"] is None or isinstance(attributes["last_response"], dict), attributes["last_response"]
-            self._last_response = None if attributes["last_response"] is None else HookResponse.HookResponse(self._requester, attributes["last_response"], completed=False)
+            self._last_response = None if attributes["last_response"] is None else github.HookResponse.HookResponse(self._requester, attributes["last_response"], completed=False)
         if "name" in attributes:  # pragma no branch
             assert attributes["name"] is None or isinstance(attributes["name"], (str, unicode)), attributes["name"]
             self._name = attributes["name"]

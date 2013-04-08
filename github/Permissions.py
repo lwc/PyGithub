@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,26 +13,39 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class Permissions(GithubObject.BasicGithubObject):
+class Permissions(github.GithubObject.NonCompletableGithubObject):
+    """
+    This class represents Permissionss as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def admin(self):
+        """
+        :type: bool
+        """
         return self._NoneIfNotSet(self._admin)
 
     @property
     def pull(self):
+        """
+        :type: bool
+        """
         return self._NoneIfNotSet(self._pull)
 
     @property
     def push(self):
+        """
+        :type: bool
+        """
         return self._NoneIfNotSet(self._push)
 
     def _initAttributes(self):
-        self._admin = GithubObject.NotSet
-        self._pull = GithubObject.NotSet
-        self._push = GithubObject.NotSet
+        self._admin = github.GithubObject.NotSet
+        self._pull = github.GithubObject.NotSet
+        self._push = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "admin" in attributes:  # pragma no branch

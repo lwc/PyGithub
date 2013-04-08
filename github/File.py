@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,56 +13,87 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class File(GithubObject.BasicGithubObject):
+class File(github.GithubObject.NonCompletableGithubObject):
+    """
+    This class represents Files as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def additions(self):
+        """
+        :type: integer
+        """
         return self._NoneIfNotSet(self._additions)
 
     @property
     def blob_url(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._blob_url)
 
     @property
     def changes(self):
+        """
+        :type: integer
+        """
         return self._NoneIfNotSet(self._changes)
 
     @property
     def deletions(self):
+        """
+        :type: integer
+        """
         return self._NoneIfNotSet(self._deletions)
 
     @property
     def filename(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._filename)
 
     @property
     def patch(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._patch)
 
     @property
     def raw_url(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._raw_url)
 
     @property
     def sha(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._sha)
 
     @property
     def status(self):
+        """
+        :type: string
+        """
         return self._NoneIfNotSet(self._status)
 
     def _initAttributes(self):
-        self._additions = GithubObject.NotSet
-        self._blob_url = GithubObject.NotSet
-        self._changes = GithubObject.NotSet
-        self._deletions = GithubObject.NotSet
-        self._filename = GithubObject.NotSet
-        self._patch = GithubObject.NotSet
-        self._raw_url = GithubObject.NotSet
-        self._sha = GithubObject.NotSet
-        self._status = GithubObject.NotSet
+        self._additions = github.GithubObject.NotSet
+        self._blob_url = github.GithubObject.NotSet
+        self._changes = github.GithubObject.NotSet
+        self._deletions = github.GithubObject.NotSet
+        self._filename = github.GithubObject.NotSet
+        self._patch = github.GithubObject.NotSet
+        self._raw_url = github.GithubObject.NotSet
+        self._sha = github.GithubObject.NotSet
+        self._status = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "additions" in attributes:  # pragma no branch

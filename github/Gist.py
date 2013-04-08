@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,108 +13,164 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
-import PaginatedList
+import github.GithubObject
+import github.PaginatedList
 
-import Gist
-import GistComment
-import NamedUser
-import GistFile
-import InputFileContent
-import GistHistoryState
+import github.GistComment
+import github.NamedUser
+import github.GistFile
+import github.GistHistoryState
 
 
-class Gist(GithubObject.GithubObject):
+class Gist(github.GithubObject.CompletableGithubObject):
+    """
+    This class represents Gists as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def comments(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._comments)
         return self._NoneIfNotSet(self._comments)
 
     @property
     def created_at(self):
+        """
+        :type: datetime.datetime
+        """
         self._completeIfNotSet(self._created_at)
         return self._NoneIfNotSet(self._created_at)
 
     @property
     def description(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._description)
         return self._NoneIfNotSet(self._description)
 
     @property
     def files(self):
+        """
+        :type: dict of string to :class:`github.GistFile.GistFile`
+        """
         self._completeIfNotSet(self._files)
         return self._NoneIfNotSet(self._files)
 
     @property
     def fork_of(self):
+        """
+        :type: :class:`github.Gist.Gist`
+        """
         self._completeIfNotSet(self._fork_of)
         return self._NoneIfNotSet(self._fork_of)
 
     @property
     def forks(self):
+        """
+        :type: list of :class:`github.Gist.Gist`
+        """
         self._completeIfNotSet(self._forks)
         return self._NoneIfNotSet(self._forks)
 
     @property
     def git_pull_url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._git_pull_url)
         return self._NoneIfNotSet(self._git_pull_url)
 
     @property
     def git_push_url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._git_push_url)
         return self._NoneIfNotSet(self._git_push_url)
 
     @property
     def history(self):
+        """
+        :type: list of :class:`github.GistHistoryState.GistHistoryState`
+        """
         self._completeIfNotSet(self._history)
         return self._NoneIfNotSet(self._history)
 
     @property
     def html_url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._html_url)
         return self._NoneIfNotSet(self._html_url)
 
     @property
     def id(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._id)
         return self._NoneIfNotSet(self._id)
 
     @property
     def public(self):
+        """
+        :type: bool
+        """
         self._completeIfNotSet(self._public)
         return self._NoneIfNotSet(self._public)
 
     @property
     def updated_at(self):
+        """
+        :type: datetime.datetime
+        """
         self._completeIfNotSet(self._updated_at)
         return self._NoneIfNotSet(self._updated_at)
 
     @property
     def url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._url)
         return self._NoneIfNotSet(self._url)
 
     @property
     def user(self):
+        """
+        :type: :class:`github.NamedUser.NamedUser`
+        """
         self._completeIfNotSet(self._user)
         return self._NoneIfNotSet(self._user)
 
     def create_comment(self, body):
+        """
+        :calls: `POST /gists/:id/comments <http://developer.github.com/v3/todo>`_
+        :param body: string
+        :rtype: :class:`github.GistComment.GistComment`
+        """
         assert isinstance(body, (str, unicode)), body
         post_parameters = {
             "body": body,
         }
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "POST",
             self.url + "/comments",
             None,
             post_parameters
         )
-        return GistComment.GistComment(self._requester, data, completed=True)
+        return github.GistComment.GistComment(self._requester, data, completed=True)
 
     def create_fork(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `POST /gists/:id/fork <http://developer.github.com/v3/todo>`_
+        :rtype: :class:`github.Gist.Gist`
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "POST",
             self.url + "/fork",
             None,
@@ -123,22 +179,32 @@ class Gist(GithubObject.GithubObject):
         return Gist(self._requester, data, completed=True)
 
     def delete(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `DELETE /gists/:id <http://developer.github.com/v3/todo>`_
+        :rtype: None
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "DELETE",
             self.url,
             None,
             None
         )
 
-    def edit(self, description=GithubObject.NotSet, files=GithubObject.NotSet):
-        assert description is GithubObject.NotSet or isinstance(description, (str, unicode)), description
-        assert files is GithubObject.NotSet or all(isinstance(element, InputFileContent.InputFileContent) for element in files.itervalues()), files
+    def edit(self, description=github.GithubObject.NotSet, files=github.GithubObject.NotSet):
+        """
+        :calls: `PATCH /gists/:id <http://developer.github.com/v3/todo>`_
+        :param description: string
+        :param files: dict of string to :class:`github.InputFileContent.InputFileContent`
+        :rtype: None
+        """
+        assert description is github.GithubObject.NotSet or isinstance(description, (str, unicode)), description
+        assert files is github.GithubObject.NotSet or all(isinstance(element, github.InputFileContent) for element in files.itervalues()), files
         post_parameters = dict()
-        if description is not GithubObject.NotSet:
+        if description is not github.GithubObject.NotSet:
             post_parameters["description"] = description
-        if files is not GithubObject.NotSet:
+        if files is not github.GithubObject.NotSet:
             post_parameters["files"] = dict((key, value._identity) for key, value in files.iteritems())
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "PATCH",
             self.url,
             None,
@@ -147,25 +213,38 @@ class Gist(GithubObject.GithubObject):
         self._useAttributes(data)
 
     def get_comment(self, id):
+        """
+        :calls: `GET /gists/comments/:id <http://developer.github.com/v3/todo>`_
+        :param id: integer
+        :rtype: :class:`github.GistComment.GistComment`
+        """
         assert isinstance(id, (int, long)), id
-        headers, data = self._requester.requestAndCheck(
+        headers, data = self._requester.requestJsonAndCheck(
             "GET",
             self.url + "/comments/" + str(id),
             None,
             None
         )
-        return GistComment.GistComment(self._requester, data, completed=True)
+        return github.GistComment.GistComment(self._requester, data, completed=True)
 
     def get_comments(self):
-        return PaginatedList.PaginatedList(
-            GistComment.GistComment,
+        """
+        :calls: `GET /gists/:id/comments <http://developer.github.com/v3/todo>`_
+        :rtype: :class:`github.PaginatedList.PaginatedList` of :class:`github.GistComment.GistComment`
+        """
+        return github.PaginatedList.PaginatedList(
+            github.GistComment.GistComment,
             self._requester,
             self.url + "/comments",
             None
         )
 
     def is_starred(self):
-        status, headers, data = self._requester.requestRaw(
+        """
+        :calls: `GET /gists/:id/star <http://developer.github.com/v3/todo>`_
+        :rtype: bool
+        """
+        status, headers, data = self._requester.requestJson(
             "GET",
             self.url + "/star",
             None,
@@ -174,7 +253,11 @@ class Gist(GithubObject.GithubObject):
         return status == 204
 
     def reset_starred(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `DELETE /gists/:id/star <http://developer.github.com/v3/todo>`_
+        :rtype: None
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "DELETE",
             self.url + "/star",
             None,
@@ -182,7 +265,11 @@ class Gist(GithubObject.GithubObject):
         )
 
     def set_starred(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `PUT /gists/:id/star <http://developer.github.com/v3/todo>`_
+        :rtype: None
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "PUT",
             self.url + "/star",
             None,
@@ -190,21 +277,21 @@ class Gist(GithubObject.GithubObject):
         )
 
     def _initAttributes(self):
-        self._comments = GithubObject.NotSet
-        self._created_at = GithubObject.NotSet
-        self._description = GithubObject.NotSet
-        self._files = GithubObject.NotSet
-        self._fork_of = GithubObject.NotSet
-        self._forks = GithubObject.NotSet
-        self._git_pull_url = GithubObject.NotSet
-        self._git_push_url = GithubObject.NotSet
-        self._history = GithubObject.NotSet
-        self._html_url = GithubObject.NotSet
-        self._id = GithubObject.NotSet
-        self._public = GithubObject.NotSet
-        self._updated_at = GithubObject.NotSet
-        self._url = GithubObject.NotSet
-        self._user = GithubObject.NotSet
+        self._comments = github.GithubObject.NotSet
+        self._created_at = github.GithubObject.NotSet
+        self._description = github.GithubObject.NotSet
+        self._files = github.GithubObject.NotSet
+        self._fork_of = github.GithubObject.NotSet
+        self._forks = github.GithubObject.NotSet
+        self._git_pull_url = github.GithubObject.NotSet
+        self._git_push_url = github.GithubObject.NotSet
+        self._history = github.GithubObject.NotSet
+        self._html_url = github.GithubObject.NotSet
+        self._id = github.GithubObject.NotSet
+        self._public = github.GithubObject.NotSet
+        self._updated_at = github.GithubObject.NotSet
+        self._url = github.GithubObject.NotSet
+        self._user = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "comments" in attributes:  # pragma no branch
@@ -219,7 +306,7 @@ class Gist(GithubObject.GithubObject):
         if "files" in attributes:  # pragma no branch
             assert attributes["files"] is None or all(isinstance(element, dict) for element in attributes["files"].itervalues()), attributes["files"]
             self._files = None if attributes["files"] is None else dict(
-                (key, GistFile.GistFile(self._requester, element, completed=False))
+                (key, github.GistFile.GistFile(self._requester, element, completed=False))
                 for key, element in attributes["files"].iteritems()
             )
         if "fork_of" in attributes:  # pragma no branch
@@ -240,7 +327,7 @@ class Gist(GithubObject.GithubObject):
         if "history" in attributes:  # pragma no branch
             assert attributes["history"] is None or all(isinstance(element, dict) for element in attributes["history"]), attributes["history"]
             self._history = None if attributes["history"] is None else [
-                GistHistoryState.GistHistoryState(self._requester, element, completed=False)
+                github.GistHistoryState.GistHistoryState(self._requester, element, completed=False)
                 for element in attributes["history"]
             ]
         if "html_url" in attributes:  # pragma no branch
@@ -260,4 +347,4 @@ class Gist(GithubObject.GithubObject):
             self._url = attributes["url"]
         if "user" in attributes:  # pragma no branch
             assert attributes["user"] is None or isinstance(attributes["user"], dict), attributes["user"]
-            self._user = None if attributes["user"] is None else NamedUser.NamedUser(self._requester, attributes["user"], completed=False)
+            self._user = None if attributes["user"] is None else github.NamedUser.NamedUser(self._requester, attributes["user"], completed=False)

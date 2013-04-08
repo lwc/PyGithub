@@ -3,7 +3,7 @@
 # Copyright 2012 Vincent Jacques
 # vincent@vincent-jacques.net
 
-# This file is part of PyGithub. http://vincent-jacques.net/PyGithub
+# This file is part of PyGithub. http://jacquev6.github.com/PyGithub/
 
 # PyGithub is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,112 +13,180 @@
 
 # You should have received a copy of the GNU Lesser General Public License along with PyGithub.  If not, see <http://www.gnu.org/licenses/>.
 
-import GithubObject
+import github.GithubObject
 
 
-class Download(GithubObject.GithubObject):
+class Download(github.GithubObject.CompletableGithubObject):
+    """
+    This class represents Downloads as returned for example by http://developer.github.com/v3/todo
+    """
+
     @property
     def accesskeyid(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._accesskeyid)
         return self._NoneIfNotSet(self._accesskeyid)
 
     @property
     def acl(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._acl)
         return self._NoneIfNotSet(self._acl)
 
     @property
     def bucket(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._bucket)
         return self._NoneIfNotSet(self._bucket)
 
     @property
     def content_type(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._content_type)
         return self._NoneIfNotSet(self._content_type)
 
     @property
     def created_at(self):
+        """
+        :type: datetime.datetime
+        """
         self._completeIfNotSet(self._created_at)
         return self._NoneIfNotSet(self._created_at)
 
     @property
     def description(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._description)
         return self._NoneIfNotSet(self._description)
 
     @property
     def download_count(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._download_count)
         return self._NoneIfNotSet(self._download_count)
 
     @property
     def expirationdate(self):
+        """
+        :type: datetime.datetime
+        """
         self._completeIfNotSet(self._expirationdate)
         return self._NoneIfNotSet(self._expirationdate)
 
     @property
     def html_url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._html_url)
         return self._NoneIfNotSet(self._html_url)
 
     @property
     def id(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._id)
         return self._NoneIfNotSet(self._id)
 
     @property
     def mime_type(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._mime_type)
         return self._NoneIfNotSet(self._mime_type)
 
     @property
     def name(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._name)
         return self._NoneIfNotSet(self._name)
 
     @property
     def path(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._path)
         return self._NoneIfNotSet(self._path)
 
     @property
     def policy(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._policy)
         return self._NoneIfNotSet(self._policy)
 
     @property
     def prefix(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._prefix)
         return self._NoneIfNotSet(self._prefix)
 
     @property
     def redirect(self):
+        """
+        :type: bool
+        """
         self._completeIfNotSet(self._redirect)
         return self._NoneIfNotSet(self._redirect)
 
     @property
     def s3_url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._s3_url)
         return self._NoneIfNotSet(self._s3_url)
 
     @property
     def signature(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._signature)
         return self._NoneIfNotSet(self._signature)
 
     @property
     def size(self):
+        """
+        :type: integer
+        """
         self._completeIfNotSet(self._size)
         return self._NoneIfNotSet(self._size)
 
     @property
     def url(self):
+        """
+        :type: string
+        """
         self._completeIfNotSet(self._url)
         return self._NoneIfNotSet(self._url)
 
     def delete(self):
-        headers, data = self._requester.requestAndCheck(
+        """
+        :calls: `DELETE /repos/:user/:repo/downloads/:id <http://developer.github.com/v3/todo>`_
+        :rtype: None
+        """
+        headers, data = self._requester.requestJsonAndCheck(
             "DELETE",
             self.url,
             None,
@@ -126,26 +194,26 @@ class Download(GithubObject.GithubObject):
         )
 
     def _initAttributes(self):
-        self._accesskeyid = GithubObject.NotSet
-        self._acl = GithubObject.NotSet
-        self._bucket = GithubObject.NotSet
-        self._content_type = GithubObject.NotSet
-        self._created_at = GithubObject.NotSet
-        self._description = GithubObject.NotSet
-        self._download_count = GithubObject.NotSet
-        self._expirationdate = GithubObject.NotSet
-        self._html_url = GithubObject.NotSet
-        self._id = GithubObject.NotSet
-        self._mime_type = GithubObject.NotSet
-        self._name = GithubObject.NotSet
-        self._path = GithubObject.NotSet
-        self._policy = GithubObject.NotSet
-        self._prefix = GithubObject.NotSet
-        self._redirect = GithubObject.NotSet
-        self._s3_url = GithubObject.NotSet
-        self._signature = GithubObject.NotSet
-        self._size = GithubObject.NotSet
-        self._url = GithubObject.NotSet
+        self._accesskeyid = github.GithubObject.NotSet
+        self._acl = github.GithubObject.NotSet
+        self._bucket = github.GithubObject.NotSet
+        self._content_type = github.GithubObject.NotSet
+        self._created_at = github.GithubObject.NotSet
+        self._description = github.GithubObject.NotSet
+        self._download_count = github.GithubObject.NotSet
+        self._expirationdate = github.GithubObject.NotSet
+        self._html_url = github.GithubObject.NotSet
+        self._id = github.GithubObject.NotSet
+        self._mime_type = github.GithubObject.NotSet
+        self._name = github.GithubObject.NotSet
+        self._path = github.GithubObject.NotSet
+        self._policy = github.GithubObject.NotSet
+        self._prefix = github.GithubObject.NotSet
+        self._redirect = github.GithubObject.NotSet
+        self._s3_url = github.GithubObject.NotSet
+        self._signature = github.GithubObject.NotSet
+        self._size = github.GithubObject.NotSet
+        self._url = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
         if "accesskeyid" in attributes:  # pragma no branch
